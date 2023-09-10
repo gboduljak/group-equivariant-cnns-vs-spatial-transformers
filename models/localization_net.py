@@ -13,7 +13,7 @@ class LocalizationNet(nn.Module):
                localization_channels,
                initialization_mode="random",
                transformation_mode="affine",
-               global_pooling="max"
+               global_pooling="mean"
                ):
     super().__init__()
     pooling = {"max": GlobalMaxPooling2d(), "mean": GlobalAvgPooling2d()}

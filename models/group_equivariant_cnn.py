@@ -58,7 +58,15 @@ class GroupConvBlock(nn.Module):
 
 class GroupEquivariantCNN(nn.Module):
 
-  def __init__(self, group, in_channels, out_channels, kernel_size, num_hidden, hidden_channels, global_pooling_mode="mean"):
+  def __init__(self,
+               group,
+               in_channels,
+               out_channels,
+               kernel_size,
+               gconv_layers,
+               channels,
+               global_pooling_mode="mean"
+               ):
     super().__init__()
 
     poolings = {
@@ -69,17 +77,17 @@ class GroupEquivariantCNN(nn.Module):
     self.lift = LiftingConvBlock(
         group=group,
         in_channels=in_channels,
-        out_channels=hidden_channels,
+        out_channels=channels,
         kernel_size=kernel_size
     )
 
     self.gconvs = torch.nn.ModuleList([
         GroupConvBlock(
             group=group,
-            in_channels=hidden_channels,
-            out_channels=hidden_channels,
+            in_channels=channels,
+            out_channels=channels,
             kernel_size=kernel_size
-        ) for _ in range(num_hidden)
+        ) for _ in range(gconv_layers)
     ])
 
     self.poolings = torch.nn.ModuleList([
@@ -87,11 +95,11 @@ class GroupEquivariantCNN(nn.Module):
             kernel_size=2,
             stride=1,
             padding=0
-        ) for _ in range(num_hidden - 1)
+        ) for _ in range(gconv_layers - 1)
     ])
 
     self.global_pooling = poolings[global_pooling_mode]
-    self.classifier = torch.nn.Linear(hidden_channels, out_channels)
+    self.classifier = torch.nn.Linear(channels, out_channels)
 
   def embed(self, x, return_intermediate_results=False):
     intermediate_results = []
