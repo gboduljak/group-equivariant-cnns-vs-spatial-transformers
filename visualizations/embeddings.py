@@ -87,11 +87,11 @@ def plot_embeddings_of_rotated_image(model, target_image: int, num_rotations: in
     ax[i][1]
     ax[i][1].set_yticks([])
 
-    fig.text(
-        0.55,
-        0.978,
-        title,
-        ha="center",
-        va="center"
-    )
+    # fig.text(
+    #     0.55,
+    #     0.978,
+    #     title,
+    #     ha="center",
+    #     va="center"
+    # )
     plt.tight_layout()

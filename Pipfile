@@ -25,6 +25,8 @@ opencv-python = "*"
 graphviz = "*"
 torchview = "*"
 einops = "*"
+pycairo = "*"
+wxpython = "*"
 
 [dev-packages]
 ipykernel = "*"

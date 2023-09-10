@@ -1,0 +1,9 @@
+training without rotations:
+    - STCNN:  multi, 5 convs, 64 channels, 37 localization channels, 5 kernel size, 821.58 K params, best run 2, max accuracy: 0.4723
+    - GCNN:
+        - (not best, but selected due to nicest plots)
+        - discretization 4, 4 convs, 32 channels, 5 kernel size, 410.73K params, best run 3, max accuracy 0.9362
+training with rotations:
+    - STCNN: single, 5 convs, 64 channels, 8 localization channels, 5 kernel size, 414.0 K params, best run 3, max accuracy: 0.9783
+    - GCNN:
+        - discretization 8, 4 convs, 32 channels, 5 kernel size, 820.33 K params, best run 1, max accuracy: 0.9861
