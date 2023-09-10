@@ -49,7 +49,7 @@ class DiscreteSO2(DiscreteGroup):
     ])
     batch_signal = signal.repeat(batch_dim, 1, 1, 1)
     sampling_grid = torch.nn.functional.affine_grid(
-        batch_grep, (batch_dim, C, H, W), align_corners=True)
+        batch_grep, (batch_dim, C, H, W), align_corners=True).to(self.device)
     return torch.nn.functional.grid_sample(
         batch_signal,
         sampling_grid,
@@ -79,13 +79,13 @@ class DiscreteSO2(DiscreteGroup):
         batch_grep,
         (batch_dim, C, H, W),
         align_corners=True
-    )  # [batch_dim, H, W, 2]
+    ).to(self.device)  # [batch_dim, H, W, 2]
 
     # Apply action on the group dimension
     sampling_grid_z = self.left_action_on_itself(
         self.inverse(batch_g),
         self.elements()
-    )  # [batch_dim, G]
+    ).to(self.device)  # [batch_dim, G]
 
     # Convert to "pixel_value" in [-1, 1]
     sampling_grid_z = normalize(sampling_grid_z)  # [batch_dim, G]
