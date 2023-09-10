@@ -5,9 +5,58 @@ from models.layers.global_pooling import GlobalAvgPooling3d, GlobalMaxPooling3d
 from models.layers.group_conv import GroupConv
 from models.layers.lifting_conv import LiftingConv
 from models.layers.group_spatial_max_pool import GroupSpatialMaxPool
+from groups.discrete_group import DiscreteGroup
 
 
-class GroupEquivariantCNN(torch.nn.Module):
+class LiftingConvBlock(nn.Module):
+  def __init__(self,
+               group: DiscreteGroup,
+               in_channels: int,
+               out_channels: int,
+               kernel_size: int) -> None:
+    super().__init__()
+
+    self.lift = LiftingConv(
+        group=group,
+        in_channels=in_channels,
+        out_channels=out_channels,
+        kernel_size=kernel_size
+    )
+    self.norm = lambda x: F.layer_norm(x, x.shape[-4:])
+    self.relu = lambda x: F.relu(x)
+
+  def forward(self, x):
+    x = self.lift(x)
+    x = self.norm(x)
+    x = self.relu(x)
+    return x
+
+
+class GroupConvBlock(nn.Module):
+  def __init__(self,
+               group: DiscreteGroup,
+               in_channels: int,
+               out_channels: int,
+               kernel_size: int) -> None:
+    super().__init__()
+
+    self.gconv = GroupConv(
+        group=group,
+        in_channels=in_channels,
+        out_channels=out_channels,
+        kernel_size=kernel_size
+    )
+    self.norm = lambda x: F.layer_norm(x, x.shape[-4:])
+    self.relu = lambda x: F.relu(x)
+
+  def forward(self, x):
+    x = self.gconv(x)
+    x = self.norm(x)
+    x = self.relu(x)
+    return x
+
+
+class GroupEquivariantCNN(nn.Module):
 
   def __init__(self, group, in_channels, out_channels, kernel_size, num_hidden, hidden_channels, global_pooling_mode="mean"):
     super().__init__()
@@ -17,7 +66,7 @@ class GroupEquivariantCNN(torch.nn.Module):
         "max": GlobalMaxPooling3d()
     }
 
-    self.lifting_conv = LiftingConv(
+    self.lift = LiftingConvBlock(
         group=group,
         in_channels=in_channels,
         out_channels=hidden_channels,
@@ -25,7 +74,7 @@ class GroupEquivariantCNN(torch.nn.Module):
     )
 
     self.gconvs = torch.nn.ModuleList([
-        GroupConv(
+        GroupConvBlock(
             group=group,
             in_channels=hidden_channels,
             out_channels=hidden_channels,
@@ -41,31 +90,38 @@ class GroupEquivariantCNN(torch.nn.Module):
         ) for _ in range(num_hidden - 1)
     ])
 
-    self.norm = lambda x: F.layer_norm(x, x.shape[-4:])
-
     self.global_pooling = poolings[global_pooling_mode]
     self.classifier = torch.nn.Linear(hidden_channels, out_channels)
 
   def embed(self, x, return_intermediate_results=False):
+    intermediate_results = []
 
-    x = self.lifting_conv(x)
-    x = self.norm(x)
-    x = F.relu(x)
+    def save(x):
+      if return_intermediate_results:
+        intermediate_results.append(x)
 
+    x = self.lift(x)
+    save(x)
     for (conv, pool) in zip(self.gconvs, self.poolings):
       x = conv(x)
-      x = self.norm(x)
-      x = F.relu(x)
+      save(x)
       x = pool(x)
-
+      save(x)
     x = self.gconvs[-1](x)
-    x = self.norm(x)
-    x = F.relu(x)
-
+    save(x)
     x = self.global_pooling(x).squeeze()
-    return x
+    save(x)
+    if return_intermediate_results:
+      return x, intermediate_results
+    else:
+      return x
 
-  def forward(self, x):
-    x = self.embed(x)
-    x = self.classifier(x)
-    return x
+  def forward(self, x, return_intermediate_results=False):
+    if not return_intermediate_results:
+      x = self.embed(x)
+      x = self.classifier(x)
+      return x
+    else:
+      x, results = self.embed(x, return_intermediate_results)
+      x = self.classifier(x)
+      return x, results.append(x)
