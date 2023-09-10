@@ -1,0 +1,34 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "*"
+matplotlib = "*"
+torch = "*"
+torchvision = "*"
+ipywidgets = "*"
+widgetsnbextension = "*"
+tqdm = "*"
+scikit-learn = "*"
+scipy = "*"
+torchinfo = "*"
+pytorch-lightning = "*"
+torchmetrics = "*"
+itkwidgets = "*"
+itk-elastix = "*"
+imgviz = "*"
+pandas = "*"
+seaborn = "*"
+opencv-python = "*"
+graphviz = "*"
+torchview = "*"
+einops = "*"
+
+[dev-packages]
+ipykernel = "*"
+autopep8 = "*"
+
+[requires]
+python_version = "3.9"
