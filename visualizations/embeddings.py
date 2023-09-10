@@ -73,7 +73,9 @@ def plot_embeddings_of_rotated_image(model, target_image: int, num_rotations: in
 
   for i, angle in enumerate(angles):
     ax[i][0].imshow(
-        rotated_digits_batch[i].squeeze().detach().numpy(), cmap="gray")
+        rotated_digits_batch[i].squeeze().detach().numpy(),
+        aspect="auto",
+        cmap="gray")
     ax[i][0].set_yticks([])
     ax[i][0].set_xticks([])
     ax[i][0].set_title(f" {int(angle.item())}°")

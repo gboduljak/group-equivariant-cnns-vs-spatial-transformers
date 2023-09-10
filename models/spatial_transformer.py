@@ -145,4 +145,4 @@ class STCNN(nn.Module):
     else:
       x, results = self.embed(x, return_intermediate_results)
       x = self.classifier(x)
-      return x, results.append(x)
+      return x, results + [x]
