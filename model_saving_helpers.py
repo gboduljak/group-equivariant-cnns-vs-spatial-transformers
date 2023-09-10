@@ -8,6 +8,12 @@ def get_model_save_name(model_name: str, model_hparams: dict, optimizer_hparams:
   channels = model_hparams["channels"]
   gconv_layers = model_hparams["gconv_layers"] if model_name == "GCNN" else ""
   conv_layers = model_hparams["conv_layers"] if model_name == "STCNN" else ""
+  mode = model_hparams["mode"] if model_name == "STCNN" else ""
+  localization_channels = model_hparams["localization_channels"] if model_name == "STCNN" else ""
+  localization_initialization_mode = model_hparams[
+      "localization_initialization_mode"] if model_name == "STCNN" else ""
+  transformation_mode = model_hparams[
+      "transformation_mode"] if model_name == "STCNN" else ""
   kernel_size = model_hparams["kernel_size"]
   batch_size = experiment_config["batch_size"]
   max_epochs = experiment_config["max_epochs"]
@@ -18,10 +24,14 @@ def get_model_save_name(model_name: str, model_hparams: dict, optimizer_hparams:
   name_parts = [
       model_name,
       f"order={order}" if order else "",
+      f"mode={mode}" if mode else "",
       f"gconv_layers={gconv_layers}" if gconv_layers else "",
       f"conv_layers={conv_layers}" if conv_layers else "",
       f"channels={channels}",
+      f"loc_channels={localization_channels}" if localization_channels else "",
       f"kernel_size={kernel_size}",
+      f"loc_init={localization_initialization_mode}" if localization_initialization_mode else "",
+      f"transform={transformation_mode}" if transformation_mode else "",
       f"batch_size={batch_size}",
       f"lr={lr}",
       f"weight_decay={weight_decay}",

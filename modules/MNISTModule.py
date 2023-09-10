@@ -2,6 +2,7 @@ from torch.nn import CrossEntropyLoss
 from torch.optim import AdamW
 from pytorch_lightning import LightningModule
 from models.group_equivariant_cnn import GroupEquivariantCNN
+from models.spatial_transformer import STCNN
 
 
 class MNISTModule(LightningModule):
@@ -14,7 +15,8 @@ class MNISTModule(LightningModule):
     super().__init__()
     assert (model_name in ["GCNN", "STCNN"])
     models = {
-        "GCNN": GroupEquivariantCNN
+        "GCNN": GroupEquivariantCNN,
+        "STCNN": STCNN
     }
     self.save_hyperparameters(
         "model_name",
