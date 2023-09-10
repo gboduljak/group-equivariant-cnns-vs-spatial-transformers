@@ -22,14 +22,17 @@ class LocalizationNet(nn.Module):
     self.conv1 = nn.Conv2d(
         in_channels=in_channels,
         out_channels=localization_channels,
-        kernel_size=kernel_size
+        kernel_size=kernel_size,
+        padding="same"
     )
     self.relu1 = nn.ReLU()
     self.pool1 = nn.MaxPool2d(2, stride=2)
     self.conv2 = nn.Conv2d(
         in_channels=localization_channels,
         out_channels=localization_channels,
-        kernel_size=kernel_size)
+        kernel_size=kernel_size,
+        padding="same"
+    )
     self.relu2 = nn.ReLU()
     self.global_pool = pooling[global_pooling]
 
