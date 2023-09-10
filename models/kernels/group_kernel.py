@@ -3,7 +3,7 @@ import torch.nn as nn
 import math
 
 
-class GroupKernel():
+class GroupKernel(nn.Module):
   def __init__(self, group, kernel_size, in_channels, out_channels):
     super().__init__()
 
