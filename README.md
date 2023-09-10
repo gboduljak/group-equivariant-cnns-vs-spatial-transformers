@@ -1,8 +1,8 @@
 # Group Equivariant CNNs Outperform Spatial Transformers on Tasks Which Require Rotation Invariance
-## Candidate number: 1068707
 
 This study aims to show that group equivariant CNNs
 outperform spatial transformers, on tasks which demand rotation invariance, by providing theoretical background and  experimental performance comparison with detailed analysis.
+The study is in **report.pdf**.
 
 #### Models implementations
 The folder **models** contains implementations of group equivariant neural networks and spatial transformers. 
