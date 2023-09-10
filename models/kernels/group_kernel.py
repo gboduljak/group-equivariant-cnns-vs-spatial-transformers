@@ -18,7 +18,7 @@ class GroupKernel(nn.Module):
         self.group.order,
         self.kernel_size,
         self.kernel_size
-    ), device=self.group.device))
+    ), device=self.group.identity.device))
 
     self.reset_parameters()
 

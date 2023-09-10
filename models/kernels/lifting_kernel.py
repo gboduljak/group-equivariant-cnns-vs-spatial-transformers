@@ -17,7 +17,7 @@ class LiftingKernel(nn.Module):
             self.in_channels,
             self.kernel_size,
             self.kernel_size
-        ), device=self.group.device)
+        ), device=self.group.identity.device)
     )
     self.reset_parameters()
 

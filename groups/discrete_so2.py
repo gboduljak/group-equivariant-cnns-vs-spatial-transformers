@@ -5,11 +5,10 @@ from groups.discrete_group import DiscreteGroup
 
 
 class DiscreteSO2(DiscreteGroup):
-  def __init__(self, order, device):
+  def __init__(self, order):
     super().__init__(
         order=torch.tensor(order),
-        identity=[0.],
-        device=device
+        identity=[0.]
     )
 
   def elements(self):
@@ -17,7 +16,7 @@ class DiscreteSO2(DiscreteGroup):
         start=0,
         end=2 * np.pi * (self.order - 1) / self.order,
         steps=self.order,
-        device=self.device
+        device=self.identity.device
     )
 
   def product(self, g, h):
@@ -25,6 +24,9 @@ class DiscreteSO2(DiscreteGroup):
 
   def inverse(self, g):
     return torch.remainder(-g, 2 * np.pi)
+
+  def get_identity(self):
+    return self.identity
 
   def left_action_on_R2(self, batch_g, batch_x):
     batched_reps = torch.stack([self.matrix_representation(g) for g in batch_g])
@@ -42,14 +44,14 @@ class DiscreteSO2(DiscreteGroup):
     batch_grep = torch.stack([
         torch.cat(
             (self.matrix_representation(g), torch.zeros(
-                2, 1, device=self.device)),
+                2, 1, device=self.identity.device)),
             dim=1
         )
         for g in batch_g
     ])
     batch_signal = signal.repeat(batch_dim, 1, 1, 1)
     sampling_grid = torch.nn.functional.affine_grid(
-        batch_grep, (batch_dim, C, H, W), align_corners=True).to(self.device)
+        batch_grep, (batch_dim, C, H, W), align_corners=True)
     return torch.nn.functional.grid_sample(
         batch_signal,
         sampling_grid,
@@ -69,7 +71,7 @@ class DiscreteSO2(DiscreteGroup):
     batch_grep = torch.stack([
         torch.cat(
             (self.matrix_representation(g), torch.zeros(
-                2, 1, device=self.device)),
+                2, 1, device=self.identity.device)),
             dim=1
         )
         for g in batch_g
@@ -79,13 +81,13 @@ class DiscreteSO2(DiscreteGroup):
         batch_grep,
         (batch_dim, C, H, W),
         align_corners=True
-    ).to(self.device)  # [batch_dim, H, W, 2]
+    )  # [batch_dim, H, W, 2]
 
     # Apply action on the group dimension
     sampling_grid_z = self.left_action_on_itself(
         self.inverse(batch_g),
         self.elements()
-    ).to(self.device)  # [batch_dim, G]
+    )  # [batch_dim, G]
 
     # Convert to "pixel_value" in [-1, 1]
     sampling_grid_z = normalize(sampling_grid_z)  # [batch_dim, G]
@@ -120,4 +122,4 @@ class DiscreteSO2(DiscreteGroup):
     return torch.tensor([
         [cos, -sin],
         [sin, cos]
-    ], device=self.device)
+    ], device=self.identity.device)
